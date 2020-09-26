@@ -43,9 +43,6 @@ public class ObjectManager : MonoBehaviour
             if (AnnounsementPanel != null) AnnounsementPanel.SetActive(false);
             prefabRegulation = false;
         }
-        
-         
-        
     }
     public void ImageTarget2(Transform ImagePos) // янтарное дерево
     {
@@ -61,9 +58,6 @@ public class ObjectManager : MonoBehaviour
             if (AnnounsementPanel != null) AnnounsementPanel.SetActive(false);
             prefabRegulation = false;
         }
-        
-                             
-       
     }
     public void ImageTarget3(Transform ImagePos) // паук
     {
@@ -95,8 +89,6 @@ public class ObjectManager : MonoBehaviour
             if (AnnounsementPanel != null) AnnounsementPanel.SetActive(false);
             prefabRegulation = false;
         }
-        
-           
     }
     public void ImageTarget5(Transform ImagePos) // магнолия
     {
@@ -115,8 +107,6 @@ public class ObjectManager : MonoBehaviour
             if (AnnounsementPanel != null) AnnounsementPanel.SetActive(false);
             prefabRegulation = false;
         }
-        
-           
     }
     public void ImageTarget6(Transform ImagePos) // стрекоза
     {
@@ -134,8 +124,6 @@ public class ObjectManager : MonoBehaviour
             if (AnnounsementPanel != null) AnnounsementPanel.SetActive(false);
             prefabRegulation = false;
         }
-        
-           
     }
     public void ImageTarget7(Transform ImagePos) // гасторнис
     {
@@ -170,8 +158,6 @@ public class ObjectManager : MonoBehaviour
             if (AnnounsementPanel != null) AnnounsementPanel.SetActive(false);
             prefabRegulation = false;
         }
-         
-        
     }
     public void ImageTarget9(Transform ImagePos) // поденка
     {
@@ -208,9 +194,7 @@ public class ObjectManager : MonoBehaviour
 
             if (AnnounsementPanel != null) AnnounsementPanel.SetActive(false);
             prefabRegulation = false;
-        }
-        
-           
+        } 
     }
     public void ImageTarget11(Transform ImagePos) // креодонт
     {
@@ -303,13 +287,38 @@ public class ObjectManager : MonoBehaviour
     }
     public void ExitTarget(AudioSource source)
     {
+
+#if UNITY_ANDROID
         if (activeObject != null)
         {
             Destroy(activeObject);           
             source.Pause();
             if (AnnounsementPanel != null) AnnounsementPanel.SetActive(true);
             prefabRegulation = true;
-        }       
+        } 
+#endif
+
+#if UNITY_EDITOR
+        if (activeObject != null)
+        {
+            Destroy(activeObject);
+            source.Pause();
+            if (AnnounsementPanel != null) AnnounsementPanel.SetActive(true);
+            prefabRegulation = true;
+        }
+#endif
+
+#if UNITY_IOS
+
+        if (AnnounsementPanel != null) AnnounsementPanel.SetActive(true);
+        prefabRegulation = true;
+        if (activeObject != null)
+        {
+            Destroy(activeObject);
+            source.Pause();          
+        }
+#endif
+
     }
 
     public void ChangeActivity()
