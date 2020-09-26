@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using System.IO;
 
 public class CameraScreenShot : MonoBehaviour
 {
@@ -40,7 +41,7 @@ public class CameraScreenShot : MonoBehaviour
     {
         if (takeSreenShotOnNextframe)
         {
-            takeSreenShotOnNextframe = false;
+           
             var texture = ScreenCapture.CaptureScreenshotAsTexture();
             texture.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0, false);
             texture.Apply();
@@ -57,19 +58,22 @@ public class CameraScreenShot : MonoBehaviour
 
 
 #if UNITY_IOS
-            //string nameiOS = string.Format("{0}_Capture{1}_{2}.png", Application.productName, "{0}", System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"));
-            string nameiOS="LifeInAmber_" +Convert.ToString(number)+".png";
-            Debug.Log("Permission result: " + NativeGallery.SaveImageToGallery(texture, Application.productName + " Captures", nameiOS));
-# endif
-            //byte[] byteArray = texture.EncodeToPNG();
+            string fullPath = Path.Combine(Application.persistentDataPath, "LiA" + number + ".png");
+            File.WriteAllBytes(fullPath, texture.EncodeToPNG());
 
-            //System.IO.File.WriteAllBytes(GetAndroidExternalStoragePath() + "/CameraScreenshot" + number + ".png", byteArray);
+            NativeGallery.SaveImageToGallery(fullPath, "PassionMaps", Path.GetFileName(fullPath));
+
+            //string nameiOS = string.Format("{0}_Capture{1}_{2}.png", Application.productName, "{0}", System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"));
+            //string nameiOS ="LifeInAmber_" +Convert.ToString(number)+".png";
+            //Debug.Log("Permission result: " + NativeGallery.SaveImageToGallery(texture, Application.productName + " Captures", nameiOS, null));// добавил null в функцию
+# endif
+            
             number++;
 
             Destroy(texture);//очистка
             Logotype.SetActive(false);
+            takeSreenShotOnNextframe = false;
 
-            //RenderTexture renderTexture = myCamera.targetTexture;   это работает но пока закоментим
         }
 
 
@@ -122,7 +126,4 @@ public class CameraScreenShot : MonoBehaviour
         }
         sound.volume = MainMenuManager.volumeLevel / 2f;
     }
-
-
-
 }

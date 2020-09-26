@@ -15,19 +15,8 @@ public class ObjectManager : MonoBehaviour
     bool prefabRegulation;
     public Slider soundSlider;
     public GameObject AnnounsementPanel;
-
-    static bool[] starsMemory;
-
-    private void Awake()
-    {
-        starsMemory = new bool[starPanel.Length];
-        int s = 0;
-        foreach (bool star in starsMemory)
-        {
-            starsMemory[s] = false;
-            s++;
-        }
-    }
+    // объявление и инициализация массива с 15 ЛОЖЬ
+    static bool[] starsMemory=new bool[] { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
 
 
     void Start()
@@ -43,14 +32,11 @@ public class ObjectManager : MonoBehaviour
             s++;
         }
        
-
         source = GetComponent<AudioSource>();
         activity = false;
         if (AnnounsementPanel != null) AnnounsementPanel.SetActive(true);
         prefabRegulation = true;
-
-
-
+               
     }
 
     public void ImageTarget1(Transform ImagePos) //пальма
