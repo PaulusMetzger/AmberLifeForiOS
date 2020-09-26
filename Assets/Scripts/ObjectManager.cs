@@ -16,17 +16,41 @@ public class ObjectManager : MonoBehaviour
     public Slider soundSlider;
     public GameObject AnnounsementPanel;
 
-    
+    bool[] starsMemory;
+
+    private void Awake()
+    {
+        starsMemory = new bool[starPanel.Length];
+        int s = 0;
+        foreach (bool star in starsMemory)
+        {
+            starsMemory[s] = false;
+            s++;
+        }
+    }
+
+
     void Start()
     {
         for (int i = 0; i < 15; i++) //не забыть изменить при добавлении новых мишеней
         {
             starPanel[i] = basePanel.transform.GetChild(i).transform.gameObject;
         }
+        int s = 0;
+        foreach (GameObject Star in starPanel)
+        {
+            if(starsMemory[s]==true) Star.GetComponent<Image>().sprite = Resources.Load<Sprite>("UI/sunIconGreen");
+            s++;
+        }
+       
+
         source = GetComponent<AudioSource>();
         activity = false;
         if (AnnounsementPanel != null) AnnounsementPanel.SetActive(true);
         prefabRegulation = true;
+
+
+
     }
 
     public void ImageTarget1(Transform ImagePos) //пальма
@@ -35,6 +59,7 @@ public class ObjectManager : MonoBehaviour
         {
             Debug.Log("первая мишень найдена");
             starPanel[0].GetComponent<Image>().sprite = Resources.Load<Sprite>("UI/sunIconGreen");
+            starsMemory[0] = true;
             source.clip = clips[0];
             if (!source.isPlaying) source.Play();
             activeObject = Instantiate(prefabs[0], Vector3.zero, Quaternion.identity);
@@ -50,6 +75,7 @@ public class ObjectManager : MonoBehaviour
         {
             Debug.Log("вторая мишень найдена");
             starPanel[1].GetComponent<Image>().sprite = Resources.Load<Sprite>("UI/sunIconGreen");
+            starsMemory[1] = true;
             source.clip = clips[1];
             if (!source.isPlaying) source.Play();
             activeObject = Instantiate(prefabs[1], Vector3.zero, Quaternion.identity);
@@ -65,6 +91,7 @@ public class ObjectManager : MonoBehaviour
         {
             Debug.Log("третья мишень найдена");
             starPanel[2].GetComponent<Image>().sprite = Resources.Load<Sprite>("UI/sunIconGreen");
+            starsMemory[2] = true;
             source.clip = clips[2];
             if (!source.isPlaying) source.Play();
             activeObject = Instantiate(prefabs[2], Vector3.zero, Quaternion.identity);
@@ -80,6 +107,7 @@ public class ObjectManager : MonoBehaviour
         {
             Debug.Log("четвертая мишень найдена");
             starPanel[3].GetComponent<Image>().sprite = Resources.Load<Sprite>("UI/sunIconGreen");
+            starsMemory[3] = true;
             source.clip = clips[3];
             if (!source.isPlaying) source.Play();
             activeObject = Instantiate(prefabs[3], Vector3.zero, Quaternion.identity);
@@ -96,6 +124,7 @@ public class ObjectManager : MonoBehaviour
         {
             Debug.Log("пятая мишень найдена");
             starPanel[4].GetComponent<Image>().sprite = Resources.Load<Sprite>("UI/sunIconGreen");
+            starsMemory[4] = true;
             source.clip = clips[4];
             if (!source.isPlaying) source.Play();
 
@@ -114,6 +143,7 @@ public class ObjectManager : MonoBehaviour
         {
             Debug.Log("шестая мишень найдена");
             starPanel[5].GetComponent<Image>().sprite = Resources.Load<Sprite>("UI/sunIconGreen");
+            starsMemory[5] = true;
             source.clip = clips[5];
             if (!source.isPlaying) source.Play();
 
@@ -131,6 +161,7 @@ public class ObjectManager : MonoBehaviour
         {
             Debug.Log("седьмая мишень найдена");
             starPanel[6].GetComponent<Image>().sprite = Resources.Load<Sprite>("UI/sunIconGreen");
+            starsMemory[6] = true;
             source.clip = clips[6];
             if (!source.isPlaying) source.Play();
 
@@ -148,6 +179,7 @@ public class ObjectManager : MonoBehaviour
         {
             Debug.Log("восьмая мишень найдена");
             starPanel[7].GetComponent<Image>().sprite = Resources.Load<Sprite>("UI/sunIconGreen");
+            starsMemory[7] = true;
             source.clip = clips[7];
             if (!source.isPlaying) source.Play();
 
@@ -165,6 +197,7 @@ public class ObjectManager : MonoBehaviour
         {
             Debug.Log("девятая мишень найдена");
             starPanel[8].GetComponent<Image>().sprite = Resources.Load<Sprite>("UI/sunIconGreen");
+            starsMemory[8] = true;
             source.clip = clips[8];
             if (!source.isPlaying) source.Play();
 
@@ -185,6 +218,7 @@ public class ObjectManager : MonoBehaviour
         {
             Debug.Log("десятая мишень найдена");
             starPanel[9].GetComponent<Image>().sprite = Resources.Load<Sprite>("UI/sunIconGreen");
+            starsMemory[9] = true;
             source.clip = clips[9];
             if (!source.isPlaying) source.Play();
 
@@ -202,6 +236,7 @@ public class ObjectManager : MonoBehaviour
         {
             Debug.Log("одинадцатая мишень найдена");
             starPanel[10].GetComponent<Image>().sprite = Resources.Load<Sprite>("UI/sunIconGreen");
+            starsMemory[10] = true;
             source.clip = clips[10];
             if (!source.isPlaying) source.Play();
 
@@ -220,6 +255,7 @@ public class ObjectManager : MonoBehaviour
         {
             Debug.Log("двенадцатая мишень найдена");
             starPanel[11].GetComponent<Image>().sprite = Resources.Load<Sprite>("UI/sunIconGreen");
+            starsMemory[11] = true;
             source.clip = clips[11];
             if (!source.isPlaying) source.Play();
 
@@ -238,6 +274,7 @@ public class ObjectManager : MonoBehaviour
         {
             Debug.Log("тринадцатая мишень найдена");
             starPanel[12].GetComponent<Image>().sprite = Resources.Load<Sprite>("UI/sunIconGreen");
+            starsMemory[12] = true;
             source.clip = clips[12];
             if (!source.isPlaying) source.Play();
 
@@ -256,6 +293,7 @@ public class ObjectManager : MonoBehaviour
         {
             Debug.Log("четырнадцатая мишень найдена");
             starPanel[13].GetComponent<Image>().sprite = Resources.Load<Sprite>("UI/sunIconGreen");
+            starsMemory[13] = true;
             source.clip = clips[13];
             if (!source.isPlaying) source.Play();
 
@@ -274,6 +312,7 @@ public class ObjectManager : MonoBehaviour
         {
             Debug.Log("пятнадцатая мишень найдена");
             starPanel[14].GetComponent<Image>().sprite = Resources.Load<Sprite>("UI/sunIconGreen");
+            starsMemory[14] = true;
             source.clip = clips[14];
             if (!source.isPlaying) source.Play();
             activeObject = Instantiate(prefabs[14], Vector3.zero, Quaternion.identity);
