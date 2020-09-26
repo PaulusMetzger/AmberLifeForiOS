@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <Photos/Photos.h>
 #import <MobileCoreServices/UTCoreTypes.h>
+#import <MobileCoreServices/MobileCoreServices.h>
 #import <ImageIO/ImageIO.h>
 #if __IPHONE_OS_VERSION_MIN_REQUIRED < 80000
 #import <AssetsLibrary/AssetsLibrary.h>
@@ -18,8 +19,9 @@ extern UIViewController* UnityGetGLViewController();
 + (int)canOpenSettings;
 + (void)openSettings;
 + (void)saveMedia:(NSString *)path albumName:(NSString *)album isImg:(BOOL)isImg;
-+ (void)pickMedia:(BOOL)imageMode savePath:(NSString *)mediaSavePath;
++ (void)pickMedia:(int)mediaType savePath:(NSString *)mediaSavePath;
 + (int)isMediaPickerBusy;
++ (int)getMediaTypeFromExtension:(NSString *)extension;
 + (char *)getImageProperties:(NSString *)path;
 + (char *)getVideoProperties:(NSString *)path;
 + (char *)getVideoThumbnail:(NSString *)path savePath:(NSString *)savePath maximumSize:(int)maximumSize captureTime:(double)captureTime;
@@ -188,8 +190,9 @@ static int imagePickerState = 0; // 0 -> none, 1 -> showing (always in this stat
 	
 	if (!isImage && ![library videoAtPathIsCompatibleWithSavedPhotosAlbum:[NSURL fileURLWithPath:path]])
 	{
+		NSLog(@"Error saving video: Video format is not compatible with Photos");
 		[[NSFileManager defaultManager] removeItemAtPath:path error:nil];
-		UnitySendMessage("NGMediaSaveCallbackiOS", "OnMediaSaveFailed", "Video format is not compatible with Photos");
+		UnitySendMessage("NGMediaSaveCallbackiOS", "OnMediaSaveFailed", "");
 		return;
 	}
 	
@@ -203,12 +206,12 @@ static int imagePickerState = 0; // 0 -> none, 1 -> showing (always in this stat
 					UnitySendMessage("NGMediaSaveCallbackiOS", "OnMediaSaveCompleted", "");
 				} failureBlock:^(NSError* error) {
 					NSLog(@"Error moving asset to album: %@", error);
-					UnitySendMessage("NGMediaSaveCallbackiOS", "OnMediaSaveFailed", [self getCString:[error localizedDescription]]);
+					UnitySendMessage("NGMediaSaveCallbackiOS", "OnMediaSaveFailed", "");
 				}];
 			}
 			else {
 				NSLog(@"Error creating asset: %@", error);
-				UnitySendMessage("NGMediaSaveCallbackiOS", "OnMediaSaveFailed", [self getCString:[error localizedDescription]]);
+				UnitySendMessage("NGMediaSaveCallbackiOS", "OnMediaSaveFailed", "");
 			}
 		};
 		
@@ -229,16 +232,16 @@ static int imagePickerState = 0; // 0 -> none, 1 -> showing (always in this stat
 			[library addAssetsGroupAlbumWithName:album resultBlock:^(ALAssetsGroup *group) {
 				saveBlock(group);
 			}
-									failureBlock:^(NSError *error) {
-										NSLog(@"Error creating album: %@", error);
-										[[NSFileManager defaultManager] removeItemAtPath:path error:nil];
-										UnitySendMessage("NGMediaSaveCallbackiOS", "OnMediaSaveFailed", [self getCString:[error localizedDescription]]);
-									}];
+			failureBlock:^(NSError *error) {
+				NSLog(@"Error creating album: %@", error);
+				[[NSFileManager defaultManager] removeItemAtPath:path error:nil];
+				UnitySendMessage("NGMediaSaveCallbackiOS", "OnMediaSaveFailed", "");
+			}];
 		}
 	} failureBlock:^(NSError* error) {
 		NSLog(@"Error listing albums: %@", error);
 		[[NSFileManager defaultManager] removeItemAtPath:path error:nil];
-		UnitySendMessage("NGMediaSaveCallbackiOS", "OnMediaSaveFailed", [self getCString:[error localizedDescription]]);
+		UnitySendMessage("NGMediaSaveCallbackiOS", "OnMediaSaveFailed", "");
 	}];
 #endif
 }
@@ -264,7 +267,7 @@ static int imagePickerState = 0; // 0 -> none, 1 -> showing (always in this stat
 				UnitySendMessage("NGMediaSaveCallbackiOS", "OnMediaSaveCompleted", "");
 			else {
 				NSLog(@"Error creating asset: %@", error);
-				UnitySendMessage("NGMediaSaveCallbackiOS", "OnMediaSaveFailed", [self getCString:[error localizedDescription]]);
+				UnitySendMessage("NGMediaSaveCallbackiOS", "OnMediaSaveFailed", "");
 			}
 		}];
 	};
@@ -286,34 +289,42 @@ static int imagePickerState = 0; // 0 -> none, 1 -> showing (always in this stat
 				if (fetchResult.count > 0)
 					saveBlock(fetchResult.firstObject);
 				else {
+					NSLog(@"Error creating album: Album placeholder not found");
 					[[NSFileManager defaultManager] removeItemAtPath:path error:nil];
-					UnitySendMessage("NGMediaSaveCallbackiOS", "OnMediaSaveFailed", "Album placeholder not found" );
+					UnitySendMessage("NGMediaSaveCallbackiOS", "OnMediaSaveFailed", "");
 				}
 			}
 			else {
 				NSLog(@"Error creating album: %@", error);
 				[[NSFileManager defaultManager] removeItemAtPath:path error:nil];
-				UnitySendMessage("NGMediaSaveCallbackiOS", "OnMediaSaveFailed", [self getCString:[error localizedDescription]]);
+				UnitySendMessage("NGMediaSaveCallbackiOS", "OnMediaSaveFailed", "");
 			}
 		}];
 	}
 }
 
 // Credit: https://stackoverflow.com/a/10531752/2373034
-+ (void)pickMedia:(BOOL)imageMode savePath:(NSString *)mediaSavePath {
++ (void)pickMedia:(int)mediaType savePath:(NSString *)mediaSavePath {
 	imagePicker = [[UIImagePickerController alloc] init];
 	imagePicker.delegate = self;
 	imagePicker.allowsEditing = NO;
 	imagePicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
 	
-	if (imageMode)
+	// mediaType is a bitmask:
+	// 1: image
+	// 2: video
+	// 4: audio (not supported)
+	if (mediaType == 1)
 		imagePicker.mediaTypes = [NSArray arrayWithObject:(NSString *)kUTTypeImage];
-	else
-	{
+	else if(mediaType == 2)
 		imagePicker.mediaTypes = [NSArray arrayWithObjects:(NSString *)kUTTypeMovie, (NSString *)kUTTypeVideo, nil];
-		
+	else
+		imagePicker.mediaTypes = [NSArray arrayWithObjects:(NSString *)kUTTypeImage, (NSString *)kUTTypeMovie, (NSString *)kUTTypeVideo, nil];
+	
+	if (mediaType != 1)
+	{
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
-		// Don't compress the picked video if possible
+		// Don't compress picked videos if possible
 		if ([[[UIDevice currentDevice] systemVersion] compare:@"11.0" options:NSNumericSearch] != NSOrderedAscending)
 			imagePicker.videoExportPreset = AVAssetExportPresetPassthrough;
 #endif
@@ -346,6 +357,27 @@ static int imagePickerState = 0; // 0 -> none, 1 -> showing (always in this stat
 	}
 	else
 		return 0;
+}
+
+// Credit: https://lists.apple.com/archives/cocoa-dev/2012/Jan/msg00052.html
++ (int)getMediaTypeFromExtension:(NSString *)extension {
+	CFStringRef fileUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, (__bridge CFStringRef) extension, NULL);
+	
+	// mediaType is a bitmask:
+	// 1: image
+	// 2: video
+	// 4: audio (not supported)
+	int result = 0;
+	if (UTTypeConformsTo(fileUTI, kUTTypeImage))
+		result = 1;
+	else if (UTTypeConformsTo(fileUTI, kUTTypeMovie) || UTTypeConformsTo(fileUTI, kUTTypeVideo))
+		result = 2;
+	else if (UTTypeConformsTo(fileUTI, kUTTypeAudio))
+		result = 4;
+	
+	CFRelease(fileUTI);
+	
+	return result;
 }
 
 // Credit: https://stackoverflow.com/a/4170099/2373034
@@ -752,16 +784,16 @@ extern "C" void _NativeGallery_VideoWriteToAlbum(const char* path, const char* a
 	[UNativeGallery saveMedia:[NSString stringWithUTF8String:path] albumName:[NSString stringWithUTF8String:album] isImg:NO];
 }
 
-extern "C" void _NativeGallery_PickImage(const char* imageSavePath) {
-	[UNativeGallery pickMedia:YES savePath:[NSString stringWithUTF8String:imageSavePath]];
-}
-
-extern "C" void _NativeGallery_PickVideo(const char* videoSavePath) {
-	[UNativeGallery pickMedia:NO savePath:[NSString stringWithUTF8String:videoSavePath]];
+extern "C" void _NativeGallery_PickMedia(const char* mediaSavePath, int mediaType) {
+	[UNativeGallery pickMedia:mediaType savePath:[NSString stringWithUTF8String:mediaSavePath]];
 }
 
 extern "C" int _NativeGallery_IsMediaPickerBusy() {
 	return [UNativeGallery isMediaPickerBusy];
+}
+
+extern "C" int _NativeGallery_GetMediaTypeFromExtension(const char* extension) {
+	return [UNativeGallery getMediaTypeFromExtension:[NSString stringWithUTF8String:extension]];
 }
 
 extern "C" char* _NativeGallery_GetImageProperties(const char* path) {

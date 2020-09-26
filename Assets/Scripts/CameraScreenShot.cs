@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 
 public class CameraScreenShot : MonoBehaviour
 {
@@ -43,9 +44,23 @@ public class CameraScreenShot : MonoBehaviour
             var texture = ScreenCapture.CaptureScreenshotAsTexture();
             texture.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0, false);
             texture.Apply();
+#if UNITY_ANDROID
             string name = string.Format("{0}_Capture{1}_{2}.png", Application.productName, "{0}", System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"));
             Debug.Log("Permission result: " + NativeGallery.SaveImageToGallery(texture, Application.productName + " Captures", name));
+#endif
 
+
+#if UNITY_EDITOR
+            string name = string.Format("{0}_Capture{1}_{2}.png", Application.productName, "{0}", System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"));
+            Debug.Log("Permission result: " + NativeGallery.SaveImageToGallery(texture, Application.productName + " Captures", name));
+#endif
+
+
+#if UNITY_IOS
+            //string nameiOS = string.Format("{0}_Capture{1}_{2}.png", Application.productName, "{0}", System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"));
+            string nameiOS="LifeInAmber_" +Convert.ToString(number)+".png";
+            Debug.Log("Permission result: " + NativeGallery.SaveImageToGallery(texture, Application.productName + " Captures", nameiOS));
+# endif
             //byte[] byteArray = texture.EncodeToPNG();
 
             //System.IO.File.WriteAllBytes(GetAndroidExternalStoragePath() + "/CameraScreenshot" + number + ".png", byteArray);
@@ -98,13 +113,7 @@ public class CameraScreenShot : MonoBehaviour
     {
         instance.TakeScreenShot(width, height);
     }
-    // Start is called before the first frame update
-    //void Start()
-    //{
-
-    //}
-
-    // Update is called once per frame
+    
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))

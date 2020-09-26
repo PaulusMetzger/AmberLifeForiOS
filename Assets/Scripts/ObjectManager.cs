@@ -16,7 +16,7 @@ public class ObjectManager : MonoBehaviour
     public Slider soundSlider;
     public GameObject AnnounsementPanel;
 
-    bool[] starsMemory;
+    static bool[] starsMemory;
 
     private void Awake()
     {
