@@ -55,7 +55,7 @@ public class DragonFly : MonoBehaviour
             {
                 anim.SetBool("Fly", false);
                 transform.position = Log.TransformPoint(startPosition.x, startPosition.y, startPosition.z);
-                transform.rotation = Quaternion.Euler(0f, 90f, 0f);
+                //transform.rotation = Quaternion.Euler(0f, 90f, 0f); //для экранной версии надо закоментить
                 regDf = true;//переменная которая обеспечивает изменение напраления полета по кругу
                 single = true;
             }
@@ -73,7 +73,7 @@ public class DragonFly : MonoBehaviour
     }
     void Returing()
     {
-        transform.LookAt(Log.TransformPoint(startPosition.x, startPosition.y, startPosition.z), Vector3.up);
+        transform.LookAt(Log.TransformPoint(startPosition.x, startPosition.y, startPosition.z), transform.up);
         if (regDf)
         {
             df = Random.Range(0f, 10f);

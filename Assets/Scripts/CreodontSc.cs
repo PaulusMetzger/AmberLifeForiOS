@@ -12,7 +12,7 @@ public class CreodontSc : MonoBehaviour
     int gast2 = 2; // регуляция перемещения по или против часовой стрелки
     Transform Log; //точка возврата модели   
     bool single;
-    bool RotBool = true;
+   
     Vector3 startPosition;
 
     void Start()
@@ -31,7 +31,6 @@ public class CreodontSc : MonoBehaviour
         {
             if (single) // выполняется однократно
             {
-                RotBool = true;               
                 anim.SetTrigger("go"); 
                 single = false;
             }

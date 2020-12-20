@@ -62,6 +62,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\AmberFormSc.cs" />
+    <Compile Include="Assets\Scripts\ArcPlant.cs" />
+    <Compile Include="Assets\Scripts\ArcetobiumSc.cs" />
     <Compile Include="Assets\Scripts\BriumSc.cs" />
     <Compile Include="Assets\Scripts\BriumSporesPS.cs" />
     <Compile Include="Assets\Scripts\ButtonPress.cs" />
@@ -72,14 +75,19 @@
     <Compile Include="Assets\Scripts\DragonFly.cs" />
     <Compile Include="Assets\Scripts\DropsAnimation.cs" />
     <Compile Include="Assets\Scripts\Ephemera.cs" />
+    <Compile Include="Assets\Scripts\FernSc.cs" />
     <Compile Include="Assets\Scripts\FitotelmatSc.cs" />
     <Compile Include="Assets\Scripts\Flowering.cs" />
     <Compile Include="Assets\Scripts\Gastornis.cs" />
+    <Compile Include="Assets\Scripts\GrassHoperSc.cs" />
+    <Compile Include="Assets\Scripts\ImageOrientation.cs" />
     <Compile Include="Assets\Scripts\Lizard.cs" />
     <Compile Include="Assets\Scripts\MagnoliaPS.cs" />
     <Compile Include="Assets\Scripts\MainMenuManager.cs" />
     <Compile Include="Assets\Scripts\MenuSc.cs" />
+    <Compile Include="Assets\Scripts\MosquitoSc.cs" />
     <Compile Include="Assets\Scripts\ObjectManager.cs" />
+    <Compile Include="Assets\Scripts\ObjectManagerScreen.cs" />
     <Compile Include="Assets\Scripts\PalmSc.cs" />
     <Compile Include="Assets\Scripts\QuercusLeavesSc.cs" />
     <Compile Include="Assets\Scripts\ResinActivity.cs" />
@@ -88,13 +96,21 @@
     <Compile Include="Assets\Scripts\Termit.cs" />
     <Compile Include="Assets\Scripts\ThujaSize.cs" />
     <Compile Include="Assets\Scripts\WindZoneRotation.cs" />
-    <None Include="Assets\StreamingAssets\Vuforia\AmberMuseum.xml" />
+    <None Include="Assets\Prefabs\19AmberForms\AmberShader2020.shader" />
+    <None Include="Assets\Prefabs\19AmberForms\AmberShader.shader" />
     <None Include="Assets\StreamingAssets\Vuforia\LifeInAmber.xml" />
+    <None Include="Assets\StreamingAssets\Vuforia\AmberMuseum.xml" />
     <None Include="Assets\StreamingAssets\Vuforia\VuforiaMars_Images.xml" />
     <None Include="Assets\Prefabs\1Palm\Impression\AmberShader.shader" />
     <None Include="Assets\StreamingAssets\Vuforia\LifeInAmber2.xml" />
+    <Reference Include="Unity.XR.Management">
+      <HintPath>C:/Users/PC/Documents/LifeInAmber/Library/ScriptAssemblies/Unity.XR.Management.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>C:/Users/PC/Documents/LifeInAmber/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Subsystem.Registration">
+      <HintPath>C:/Users/PC/Documents/LifeInAmber/Library/ScriptAssemblies/Unity.Subsystem.Registration.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VSCode.Editor">
       <HintPath>C:/Users/PC/Documents/LifeInAmber/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
@@ -117,14 +133,29 @@
     <Reference Include="Unity.CollabProxy.Editor">
       <HintPath>C:/Users/PC/Documents/LifeInAmber/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.XR.LegacyInputHelpers">
+      <HintPath>C:/Users/PC/Documents/LifeInAmber/Library/ScriptAssemblies/UnityEngine.XR.LegacyInputHelpers.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.XR.Management.Editor">
+      <HintPath>C:/Users/PC/Documents/LifeInAmber/Library/ScriptAssemblies/Unity.XR.Management.Editor.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.Rider.Editor">
       <HintPath>C:/Users/PC/Documents/LifeInAmber/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.2D.Sprite.Editor">
       <HintPath>C:/Users/PC/Documents/LifeInAmber/Library/ScriptAssemblies/Unity.2D.Sprite.Editor.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEditor.SpatialTracking">
+      <HintPath>C:/Users/PC/Documents/LifeInAmber/Library/ScriptAssemblies/UnityEditor.SpatialTracking.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.SpatialTracking">
+      <HintPath>C:/Users/PC/Documents/LifeInAmber/Library/ScriptAssemblies/UnityEngine.SpatialTracking.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.TextMeshPro">
       <HintPath>C:/Users/PC/Documents/LifeInAmber/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.XR.LegacyInputHelpers">
+      <HintPath>C:/Users/PC/Documents/LifeInAmber/Library/ScriptAssemblies/UnityEditor.XR.LegacyInputHelpers.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.UI">
       <HintPath>C:/Users/PC/Documents/LifeInAmber/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>

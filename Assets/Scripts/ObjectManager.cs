@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class ObjectManager : MonoBehaviour
 {
-    GameObject[] starPanel = new GameObject[15]; //не забыть изменить при добавлении новых мишеней
+    GameObject[] starPanel = new GameObject[20]; //не забыть изменить при добавлении новых мишеней
     public GameObject basePanel;
 
     AudioSource source;
@@ -16,12 +16,12 @@ public class ObjectManager : MonoBehaviour
     public Slider soundSlider;
     public GameObject AnnounsementPanel;
     // объявление и инициализация массива с 15 ЛОЖЬ
-    static bool[] starsMemory=new bool[] { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
+    static bool[] starsMemory=new bool[] { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
 
 
     void Start()
     {
-        for (int i = 0; i < 15; i++) //не забыть изменить при добавлении новых мишеней
+        for (int i = 0; i < 20; i++) //не забыть изменить при добавлении новых мишеней
         {
             starPanel[i] = basePanel.transform.GetChild(i).transform.gameObject;
         }
@@ -98,8 +98,8 @@ public class ObjectManager : MonoBehaviour
             if (!source.isPlaying) source.Play();
             activeObject = Instantiate(prefabs[3], Vector3.zero, Quaternion.identity);
             //тут должно совпадать с координатами соответствующей мишени
+            activeObject.transform.Rotate(90, 0, 0);
             activeObject.transform.position = ImagePos.position;
-
             if (AnnounsementPanel != null) AnnounsementPanel.SetActive(false);
             prefabRegulation = false;
         }
@@ -113,12 +113,10 @@ public class ObjectManager : MonoBehaviour
             starsMemory[4] = true;
             source.clip = clips[4];
             if (!source.isPlaying) source.Play();
-
             activeObject = Instantiate(prefabs[4], Vector3.zero, Quaternion.identity);
             activeObject.transform.Rotate(90, 0, 0);
             //тут должно совпадать с координатами соответствующей мишени
             activeObject.transform.position = ImagePos.position;
-
             if (AnnounsementPanel != null) AnnounsementPanel.SetActive(false);
             prefabRegulation = false;
         }
@@ -132,11 +130,9 @@ public class ObjectManager : MonoBehaviour
             starsMemory[5] = true;
             source.clip = clips[5];
             if (!source.isPlaying) source.Play();
-
             activeObject = Instantiate(prefabs[5], Vector3.zero, Quaternion.identity);
             //тут должно совпадать с координатами соответствующей мишени
             activeObject.transform.position = ImagePos.position;
-
             if (AnnounsementPanel != null) AnnounsementPanel.SetActive(false);
             prefabRegulation = false;
         }
@@ -150,11 +146,9 @@ public class ObjectManager : MonoBehaviour
             starsMemory[6] = true;
             source.clip = clips[6];
             if (!source.isPlaying) source.Play();
-
             activeObject = Instantiate(prefabs[6], Vector3.zero, Quaternion.identity);
             //тут должно совпадать с координатами соответствующей мишени
             activeObject.transform.position = ImagePos.position;
-
             if (AnnounsementPanel != null) AnnounsementPanel.SetActive(false);
             prefabRegulation = false;
         }
@@ -168,11 +162,9 @@ public class ObjectManager : MonoBehaviour
             starsMemory[7] = true;
             source.clip = clips[7];
             if (!source.isPlaying) source.Play();
-
             activeObject = Instantiate(prefabs[7], Vector3.zero, Quaternion.identity);
             //тут должно совпадать с координатами соответствующей мишени
             activeObject.transform.position = ImagePos.position;
-
             if (AnnounsementPanel != null) AnnounsementPanel.SetActive(false);
             prefabRegulation = false;
         }
@@ -302,6 +294,95 @@ public class ObjectManager : MonoBehaviour
             source.clip = clips[14];
             if (!source.isPlaying) source.Play();
             activeObject = Instantiate(prefabs[14], Vector3.zero, Quaternion.identity);
+            activeObject.transform.Rotate(90, 0, 0);
+            //тут должно совпадать с координатами соответствующей мишени
+            activeObject.transform.position = ImagePos.position;
+
+            if (AnnounsementPanel != null) AnnounsementPanel.SetActive(false);
+            prefabRegulation = false;
+        }
+    }
+    public void ImageTarget16(Transform ImagePos) // кузнечик
+    {
+        if (prefabRegulation)
+        {
+            Debug.Log("шеснадцатая мишень найдена");
+            starPanel[15].GetComponent<Image>().sprite = Resources.Load<Sprite>("UI/sunIconGreen");
+            starsMemory[15] = true;
+            source.clip = clips[15];
+            if (!source.isPlaying) source.Play();
+            activeObject = Instantiate(prefabs[15], Vector3.zero, Quaternion.identity);
+            activeObject.transform.Rotate(90, 0, 0);
+            //тут должно совпадать с координатами соответствующей мишени
+            activeObject.transform.position = ImagePos.position;
+
+            if (AnnounsementPanel != null) AnnounsementPanel.SetActive(false);
+            prefabRegulation = false;
+        }
+    }
+    public void ImageTarget17(Transform ImagePos) // комар
+    {
+        if (prefabRegulation)
+        {
+            Debug.Log("семнадцатая мишень найдена");
+            starPanel[16].GetComponent<Image>().sprite = Resources.Load<Sprite>("UI/sunIconGreen");
+            starsMemory[16] = true;
+            source.clip = clips[16];
+            if (!source.isPlaying) source.Play();
+            activeObject = Instantiate(prefabs[16], Vector3.zero, Quaternion.identity);
+            activeObject.transform.Rotate(90, 0, 0);
+            //тут должно совпадать с координатами соответствующей мишени
+            activeObject.transform.position = ImagePos.position;
+
+            if (AnnounsementPanel != null) AnnounsementPanel.SetActive(false);
+            prefabRegulation = false;
+        }
+    }
+    public void ImageTarget18(Transform ImagePos) // паразит арцетобиум
+    {
+        if (prefabRegulation)
+        {
+            Debug.Log("восемнадцатая мишень найдена");
+            starPanel[17].GetComponent<Image>().sprite = Resources.Load<Sprite>("UI/sunIconGreen");
+            starsMemory[17] = true;
+            source.clip = clips[17];
+            if (!source.isPlaying) source.Play();
+            activeObject = Instantiate(prefabs[17], Vector3.zero, Quaternion.identity);
+            activeObject.transform.Rotate(90, 0, 0);
+            //тут должно совпадать с координатами соответствующей мишени
+            activeObject.transform.position = new Vector3(ImagePos.position.x, ImagePos.position.y, ImagePos.position.z-3);
+            if (AnnounsementPanel != null) AnnounsementPanel.SetActive(false);
+            prefabRegulation = false;
+        }
+    }
+    public void ImageTarget19(Transform ImagePos) // формы янтаря
+    {
+        if (prefabRegulation)
+        {
+            Debug.Log("девятнадцатая мишень найдена");
+            starPanel[18].GetComponent<Image>().sprite = Resources.Load<Sprite>("UI/sunIconGreen");
+            starsMemory[18] = true;
+            source.clip = clips[18];
+            if (!source.isPlaying) source.Play();
+            activeObject = Instantiate(prefabs[18], Vector3.zero, Quaternion.identity);
+            activeObject.transform.Rotate(90, 0, 0);
+            //тут должно совпадать с координатами соответствующей мишени
+            activeObject.transform.position = ImagePos.position;
+
+            if (AnnounsementPanel != null) AnnounsementPanel.SetActive(false);
+            prefabRegulation = false;
+        }
+    }
+    public void ImageTarget20(Transform ImagePos) // папоротник
+    {
+        if (prefabRegulation)
+        {
+            Debug.Log("двадцатая мишень найдена");
+            starPanel[19].GetComponent<Image>().sprite = Resources.Load<Sprite>("UI/sunIconGreen");
+            starsMemory[19] = true;
+            source.clip = clips[19];
+            if (!source.isPlaying) source.Play();
+            activeObject = Instantiate(prefabs[19], Vector3.zero, Quaternion.identity);
             activeObject.transform.Rotate(90, 0, 0);
             //тут должно совпадать с координатами соответствующей мишени
             activeObject.transform.position = ImagePos.position;

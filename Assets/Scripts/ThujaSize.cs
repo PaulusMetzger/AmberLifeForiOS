@@ -19,8 +19,7 @@ public class ThujaSize : MonoBehaviour
     void Update()
     {
         if (x != ObjectManager.activity)
-        {
-            
+        {            
             if (i==0) anim.SetTrigger("large");
             else anim.SetTrigger("small");
             if(i > 0) i = 0;

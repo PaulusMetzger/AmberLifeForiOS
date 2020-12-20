@@ -14,4 +14,9 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/TestScene.unity
     guid: a4981beb4a731054d83b2ebcc0e745d5
-  m_configObjects: {}
+  - enabled: 0
+    path: Assets/Scenes/ScreenScene.unity
+    guid: 12bb05c1b51d6ad47aa961968eff3475
+  m_configObjects:
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 07fa734b17e977a4eba2ed9e8c238693,
+      type: 2}

@@ -621,6 +621,8 @@
     <None Include="Assets\Plugins\NativeGallery\Editor\NativeGallery.Editor.asmdef" />
     <None Include="Assets\Plugins\NativeGallery\NativeGallery.Runtime.asmdef" />
     <None Include="Assets\Plugins\NativeGallery\README.txt" />
+    <None Include="Assets\Prefabs\19AmberForms\AmberShader.shader" />
+    <None Include="Assets\Prefabs\19AmberForms\AmberShader2020.shader" />
     <None Include="Assets\Prefabs\1Palm\Impression\AmberShader.shader" />
     <None Include="Assets\StreamingAssets\Vuforia\AmberMuseum.xml" />
     <None Include="Assets\StreamingAssets\Vuforia\LifeInAmber.xml" />
@@ -666,6 +668,8 @@
     <None Include="Packages\com.unity.ext.nunit\net35\unity-custom\nunit.framework.xml" />
     <None Include="Packages\com.unity.ide.rider\Rider\Editor\com.unity.ide.rider.asmdef" />
     <None Include="Packages\com.unity.ide.vscode\Editor\Unity.com.unity.vscode.Editor.asmdef" />
+    <None Include="Packages\com.unity.subsystemregistration\Runtime\Unity.Subsystem.Registration.asmdef" />
+    <None Include="Packages\com.unity.subsystemregistration\Tests\Runtime\Unity.Subsystem.Registration.Runtime.Tests.asmdef" />
     <None Include="Packages\com.unity.test-framework\UnityEditor.TestRunner\UnityEditor.TestRunner.asmdef" />
     <None Include="Packages\com.unity.test-framework\UnityEngine.TestRunner\UnityEngine.TestRunner.asmdef" />
     <None Include="Packages\com.unity.textmeshpro\Editor Resources\Shaders\TMP_Properties.cginc" />
@@ -685,6 +689,20 @@
     <None Include="Packages\com.unity.ugui\Runtime\UnityEngine.UI.asmdef" />
     <None Include="Packages\com.unity.ugui\Tests\Editor\UnityEditor.UI.EditorTests.asmdef" />
     <None Include="Packages\com.unity.ugui\Tests\Runtime\UnityEngine.UI.Tests.asmdef" />
+    <None Include="Packages\com.unity.xr.legacyinputhelpers\Editor\LegacyInputHelpersEditor.asmdef" />
+    <None Include="Packages\com.unity.xr.legacyinputhelpers\Editor\TrackedPoseDriver\UnityEditor.SpatialTracking.asmdef" />
+    <None Include="Packages\com.unity.xr.legacyinputhelpers\Runtime\LegacyInputHelpers.asmdef" />
+    <None Include="Packages\com.unity.xr.legacyinputhelpers\Runtime\TrackedPoseDriver\UnityEngine.SpatialTracking.asmdef" />
+    <None Include="Packages\com.unity.xr.legacyinputhelpers\Tests\Editor\LegacyInputHelpersEditorTests.asmdef" />
+    <None Include="Packages\com.unity.xr.legacyinputhelpers\Tests\Runtime\TrackedPoseDriver\UnityEngine.SpatialTracking.Tests.asmdef" />
+    <None Include="Packages\com.unity.xr.management\Editor\Unity.XR.Management.Editor.asmdef" />
+    <None Include="Packages\com.unity.xr.management\Runtime\Unity.XR.Management.asmdef" />
+    <None Include="Packages\com.unity.xr.management\Tests\Editor\Unity.XR.Management.EditorTests.asmdef" />
+    <None Include="Packages\com.unity.xr.management\Tests\Runtime\Unity.XR.Management.Tests.asmdef" />
+    <None Include="Packages\com.unity.xr.management\Tests\StandaloneSubsystem\Unity.XR.Management.Tests.Standalone.asmdef" />
+    <None Include="Packages\com.unity.xr.management\Tests\TestPackage\Editor\Uniyt.XR.Management.TestPackage.Editor.asmdef" />
+    <None Include="Packages\com.unity.xr.management\Tests\TestPackage\Runtime\Uniyt.XR.Management.TestPackage.asmdef" />
+    <None Include="Packages\com.unity.xr.management\Tests\TestTooling\Unity.XR.TestSupport.asmdef" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

@@ -15,7 +15,6 @@ public class Gastornis : MonoBehaviour
     AudioSource Kar;
     bool Korut; // однократный запуск крика
     bool single;
-    bool RotBool = true;
     Vector3 startPosition;
     Slider soundSlider;
 
@@ -24,6 +23,7 @@ public class Gastornis : MonoBehaviour
         g = ObjectManager.activity;
         anim = GetComponent<Animator>();        
         Kar = GetComponent<AudioSource>();
+        Kar.volume=0.3f;
         soundSlider = GameObject.Find("SoundSlider").GetComponent<Slider>();
         //точка рассчитывается относительно второго объекта префаба
         Nest = transform.parent.gameObject.transform.GetChild(1).transform; 
@@ -54,7 +54,6 @@ public class Gastornis : MonoBehaviour
         {
             if (single) // выполняется однократно
             {
-                RotBool = true;
                 StopCoroutine(Golos());
                 anim.SetBool("golos", false);
                 anim.SetBool("go", true);
@@ -103,6 +102,6 @@ public class Gastornis : MonoBehaviour
     }
     void Returning()
     {
-        transform.LookAt(Nest.TransformPoint(startPosition.x, startPosition.y, startPosition.z), Vector3.up);       
+        transform.LookAt(Nest.TransformPoint(startPosition.x, startPosition.y, startPosition.z), transform.up);
     }
 }

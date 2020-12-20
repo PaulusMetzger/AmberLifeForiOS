@@ -13,6 +13,7 @@ public class CameraScreenShot : MonoBehaviour
     AudioSource sound;
 
     public GameObject Logotype;
+    string shootName;
 
 
     private void Awake()
@@ -46,13 +47,13 @@ public class CameraScreenShot : MonoBehaviour
             texture.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0, false);
             texture.Apply();
 #if UNITY_ANDROID
-            string name = string.Format("{0}_Capture{1}_{2}.png", Application.productName, "{0}", System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"));
+            shootName = string.Format("{0}_Capture{1}_{2}.png", Application.productName, "{0}", System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"));
             Debug.Log("Permission result: " + NativeGallery.SaveImageToGallery(texture, Application.productName + " Captures", name));
 #endif
 
 
 #if UNITY_EDITOR
-            string name = string.Format("{0}_Capture{1}_{2}.png", Application.productName, "{0}", System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"));
+            shootName = string.Format("{0}_Capture{1}_{2}.png", Application.productName, "{0}", System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"));
             Debug.Log("Permission result: " + NativeGallery.SaveImageToGallery(texture, Application.productName + " Captures", name));
 #endif
 
@@ -60,7 +61,6 @@ public class CameraScreenShot : MonoBehaviour
 #if UNITY_IOS
             string fullPath = Path.Combine(Application.persistentDataPath, "LiA" + number + ".png");
             File.WriteAllBytes(fullPath, texture.EncodeToPNG());
-
             NativeGallery.SaveImageToGallery(fullPath, "PassionMaps", Path.GetFileName(fullPath));
 
             //string nameiOS = string.Format("{0}_Capture{1}_{2}.png", Application.productName, "{0}", System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"));
@@ -69,11 +69,9 @@ public class CameraScreenShot : MonoBehaviour
 # endif
             
             number++;
-
             Destroy(texture);//очистка
             Logotype.SetActive(false);
             takeSreenShotOnNextframe = false;
-
         }
 
 

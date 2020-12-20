@@ -40,6 +40,7 @@ public static class NativeGallery
 		}
 	}
 
+	public enum PermissionType { Read = 0, Write = 1 };
 	public enum Permission { Denied = 0, Granted = 1, ShouldAsk = 2 };
 	public enum MediaType { Image = 1, Video = 2, Audio = 4 };
 
@@ -82,10 +83,13 @@ public static class NativeGallery
 	}
 #elif !UNITY_EDITOR && UNITY_IOS
 	[System.Runtime.InteropServices.DllImport( "__Internal" )]
-	private static extern int _NativeGallery_CheckPermission();
+	private static extern int _NativeGallery_CheckPermission( int readPermission, int permissionFreeMode );
 
 	[System.Runtime.InteropServices.DllImport( "__Internal" )]
-	private static extern int _NativeGallery_RequestPermission();
+	private static extern int _NativeGallery_RequestPermission( int readPermission, int permissionFreeMode );
+
+	[System.Runtime.InteropServices.DllImport( "__Internal" )]
+	private static extern void _NativeGallery_ShowLimitedLibraryPicker();
 
 	[System.Runtime.InteropServices.DllImport( "__Internal" )]
 	private static extern int _NativeGallery_CanOpenSettings();
@@ -94,16 +98,19 @@ public static class NativeGallery
 	private static extern void _NativeGallery_OpenSettings();
 
 	[System.Runtime.InteropServices.DllImport( "__Internal" )]
+	private static extern int _NativeGallery_CanPickMultipleMedia();
+
+	[System.Runtime.InteropServices.DllImport( "__Internal" )]
 	private static extern int _NativeGallery_GetMediaTypeFromExtension( string extension );
 
 	[System.Runtime.InteropServices.DllImport( "__Internal" )]
-	private static extern void _NativeGallery_ImageWriteToAlbum( string path, string album );
+	private static extern void _NativeGallery_ImageWriteToAlbum( string path, string album, int permissionFreeMode );
 
 	[System.Runtime.InteropServices.DllImport( "__Internal" )]
-	private static extern void _NativeGallery_VideoWriteToAlbum( string path, string album );
+	private static extern void _NativeGallery_VideoWriteToAlbum( string path, string album, int permissionFreeMode );
 
 	[System.Runtime.InteropServices.DllImport( "__Internal" )]
-	private static extern void _NativeGallery_PickMedia( string mediaSavePath, int mediaType );
+	private static extern void _NativeGallery_PickMedia( string mediaSavePath, int mediaType, int permissionFreeMode, int selectionLimit );
 
 	[System.Runtime.InteropServices.DllImport( "__Internal" )]
 	private static extern string _NativeGallery_GetImageProperties( string path );
@@ -152,22 +159,34 @@ public static class NativeGallery
 	#endregion
 
 	#region Runtime Permissions
-	public static Permission CheckPermission( bool readPermissionOnly = false )
+	// PermissionFreeMode was initially planned to be a toggleable setting on iOS but it has its own issues when set to false, so its value is forced to true.
+	// These issues are:
+	// - Presented permission dialog will have a "Select Photos" option on iOS 14+ but clicking it will freeze and eventually crash the app (I'm guessing that
+	//   this is caused by how permissions are handled synchronously in NativeGallery)
+	// - While saving images/videos to Photos, iOS 14+ users would see the "Select Photos" option (which is irrelevant in this context, hence confusing) and
+	//   the user must grant full Photos access in order to save the image/video to a custom album
+	// The only downside of having PermissionFreeMode = true is that, on iOS 14+, images/videos will be saved to the default Photos album rather than the
+	// provided custom album
+	private const bool PermissionFreeMode = true;
+
+	public static Permission CheckPermission( PermissionType permissionType )
 	{
 #if !UNITY_EDITOR && UNITY_ANDROID
-		Permission result = (Permission) AJC.CallStatic<int>( "CheckPermission", Context, readPermissionOnly );
+		Permission result = (Permission) AJC.CallStatic<int>( "CheckPermission", Context, permissionType == PermissionType.Read );
 		if( result == Permission.Denied && (Permission) PlayerPrefs.GetInt( "NativeGalleryPermission", (int) Permission.ShouldAsk ) == Permission.ShouldAsk )
 			result = Permission.ShouldAsk;
 
 		return result;
 #elif !UNITY_EDITOR && UNITY_IOS
-		return (Permission) _NativeGallery_CheckPermission();
+		// result == 3: LimitedAccess permission on iOS, no need to handle it when PermissionFreeMode is set to true
+		int result = _NativeGallery_CheckPermission( permissionType == PermissionType.Read ? 1 : 0, PermissionFreeMode ? 1 : 0 );
+		return result == 3 ? Permission.Granted : (Permission) result;
 #else
 		return Permission.Granted;
 #endif
 	}
 
-	public static Permission RequestPermission( bool readPermissionOnly = false )
+	public static Permission RequestPermission( PermissionType permissionType )
 	{
 #if !UNITY_EDITOR && UNITY_ANDROID
 		object threadLock = new object();
@@ -175,7 +194,7 @@ public static class NativeGallery
 		{
 			NGPermissionCallbackAndroid nativeCallback = new NGPermissionCallbackAndroid( threadLock );
 
-			AJC.CallStatic( "RequestPermission", Context, nativeCallback, readPermissionOnly, PlayerPrefs.GetInt( "NativeGalleryPermission", (int) Permission.ShouldAsk ) );
+			AJC.CallStatic( "RequestPermission", Context, nativeCallback, permissionType == PermissionType.Read, PlayerPrefs.GetInt( "NativeGalleryPermission", (int) Permission.ShouldAsk ) );
 
 			if( nativeCallback.Result == -1 )
 				System.Threading.Monitor.Wait( threadLock );
@@ -189,9 +208,22 @@ public static class NativeGallery
 			return (Permission) nativeCallback.Result;
 		}
 #elif !UNITY_EDITOR && UNITY_IOS
-		return (Permission) _NativeGallery_RequestPermission();
+		// result == 3: LimitedAccess permission on iOS, no need to handle it when PermissionFreeMode is set to true
+		int result = _NativeGallery_RequestPermission( permissionType == PermissionType.Read ? 1 : 0, PermissionFreeMode ? 1 : 0 );
+		return result == 3 ? Permission.Granted : (Permission) result;
 #else
 		return Permission.Granted;
+#endif
+	}
+
+	// This function isn't needed when PermissionFreeMode is set to true
+	private static void TryExtendLimitedAccessPermission()
+	{
+		if( IsMediaPickerBusy() )
+			return;
+
+#if !UNITY_EDITOR && UNITY_IOS
+		_NativeGallery_ShowLimitedLibraryPicker();
 #endif
 	}
 
@@ -230,9 +262,9 @@ public static class NativeGallery
 		if( image == null )
 			throw new ArgumentException( "Parameter 'image' is null!" );
 
-		if( filename.EndsWith( ".jpeg" ) || filename.EndsWith( ".jpg" ) )
+		if( filename.EndsWith( ".jpeg", StringComparison.OrdinalIgnoreCase ) || filename.EndsWith( ".jpg", StringComparison.OrdinalIgnoreCase ) )
 			return SaveToGallery( GetTextureBytes( image, true ), album, filename, MediaType.Image, callback );
-		else if( filename.EndsWith( ".png" ) )
+		else if( filename.EndsWith( ".png", StringComparison.OrdinalIgnoreCase ) )
 			return SaveToGallery( GetTextureBytes( image, false ), album, filename, MediaType.Image, callback );
 		else
 			return SaveToGallery( GetTextureBytes( image, false ), album, filename + ".png", MediaType.Image, callback );
@@ -264,6 +296,8 @@ public static class NativeGallery
 	{
 #if !UNITY_EDITOR && UNITY_ANDROID
 		return AJC.CallStatic<bool>( "CanSelectMultipleMedia" );
+#elif !UNITY_EDITOR && UNITY_IOS
+		return _NativeGallery_CanPickMultipleMedia() == 1;
 #else
 		return false;
 #endif
@@ -271,9 +305,11 @@ public static class NativeGallery
 
 	public static bool CanSelectMultipleMediaTypesFromGallery()
 	{
-#if !UNITY_EDITOR && UNITY_ANDROID
+#if UNITY_EDITOR
+		return true;
+#elif UNITY_ANDROID
 		return AJC.CallStatic<bool>( "CanSelectMultipleMediaTypes" );
-#elif !UNITY_EDITOR && UNITY_IOS
+#elif UNITY_IOS
 		return true;
 #else
 		return false;
@@ -346,7 +382,17 @@ public static class NativeGallery
 			extension = extension.Substring( 1 );
 		}
 
-#if !UNITY_EDITOR && UNITY_ANDROID
+#if UNITY_EDITOR
+		extension = extension.ToLowerInvariant();
+		if( extension == "png" || extension == "jpg" || extension == "jpeg" || extension == "gif" || extension == "bmp" || extension == "tiff" )
+			return MediaType.Image;
+		else if( extension == "mp4" || extension == "mov" || extension == "wav" || extension == "avi" )
+			return MediaType.Video;
+		else if( extension == "mp3" || extension == "aac" || extension == "flac" )
+			return MediaType.Audio;
+
+		return (MediaType) 0;
+#elif UNITY_ANDROID
 		string mime = AJC.CallStatic<string>( "GetMimeTypeFromExtension", extension.ToLowerInvariant() );
 		if( string.IsNullOrEmpty( mime ) )
 			return (MediaType) 0;
@@ -358,7 +404,7 @@ public static class NativeGallery
 			return MediaType.Audio;
 		else
 			return (MediaType) 0;
-#elif !UNITY_EDITOR && UNITY_IOS
+#elif UNITY_IOS
 		return (MediaType) _NativeGallery_GetMediaTypeFromExtension( extension.ToLowerInvariant() );
 #else
 		return (MediaType) 0;
@@ -369,7 +415,7 @@ public static class NativeGallery
 	#region Internal Functions
 	private static Permission SaveToGallery( byte[] mediaBytes, string album, string filename, MediaType mediaType, MediaSaveCallback callback )
 	{
-		Permission result = RequestPermission( false );
+		Permission result = RequestPermission( PermissionType.Write );
 		if( result == Permission.Granted )
 		{
 			if( mediaBytes == null || mediaBytes.Length == 0 )
@@ -399,7 +445,7 @@ public static class NativeGallery
 
 	private static Permission SaveToGallery( string existingMediaPath, string album, string filename, MediaType mediaType, MediaSaveCallback callback )
 	{
-		Permission result = RequestPermission( false );
+		Permission result = RequestPermission( PermissionType.Write );
 		if( result == Permission.Granted )
 		{
 			if( !File.Exists( existingMediaPath ) )
@@ -457,9 +503,9 @@ public static class NativeGallery
 
 		NGMediaSaveCallbackiOS.Initialize( callback );
 		if( mediaType == MediaType.Image )
-			_NativeGallery_ImageWriteToAlbum( path, album );
+			_NativeGallery_ImageWriteToAlbum( path, album, PermissionFreeMode ? 1 : 0 );
 		else if( mediaType == MediaType.Video )
-			_NativeGallery_VideoWriteToAlbum( path, album );
+			_NativeGallery_VideoWriteToAlbum( path, album, PermissionFreeMode ? 1 : 0 );
 #else
 		if( callback != null )
 			callback( true, null );
@@ -498,12 +544,40 @@ public static class NativeGallery
 
 	private static Permission GetMediaFromGallery( MediaPickCallback callback, MediaType mediaType, string mime, string title )
 	{
-		Permission result = RequestPermission( true );
+		Permission result = RequestPermission( PermissionType.Read );
 		if( result == Permission.Granted && !IsMediaPickerBusy() )
 		{
-#if !UNITY_EDITOR && UNITY_ANDROID
+#if UNITY_EDITOR
+			System.Collections.Generic.List<string> editorFilters = new System.Collections.Generic.List<string>( 4 );
+
+			if( ( mediaType & MediaType.Image ) == MediaType.Image )
+			{
+				editorFilters.Add( "Image files" );
+				editorFilters.Add( "png,jpg,jpeg" );
+			}
+
+			if( ( mediaType & MediaType.Video ) == MediaType.Video )
+			{
+				editorFilters.Add( "Video files" );
+				editorFilters.Add( "mp4,mov,wav,avi" );
+			}
+
+			if( ( mediaType & MediaType.Audio ) == MediaType.Audio )
+			{
+				editorFilters.Add( "Audio files" );
+				editorFilters.Add( "mp3,aac,flac" );
+			}
+
+			editorFilters.Add( "All files" );
+			editorFilters.Add( "*" );
+
+			string pickedFile = UnityEditor.EditorUtility.OpenFilePanelWithFilters( "Select file", "", editorFilters.ToArray() );
+
+			if( callback != null )
+				callback( pickedFile != "" ? pickedFile : null );
+#elif UNITY_ANDROID
 			AJC.CallStatic( "PickMedia", Context, new NGMediaReceiveCallbackAndroid( callback, null ), (int) mediaType, false, SelectedMediaPath, mime, title );
-#elif !UNITY_EDITOR && UNITY_IOS
+#elif UNITY_IOS
 			if( mediaType == MediaType.Audio )
 			{
 				Debug.LogError( "Picking audio files is not supported on iOS" );
@@ -513,8 +587,8 @@ public static class NativeGallery
 			}
 			else
 			{
-				NGMediaReceiveCallbackiOS.Initialize( callback );
-				_NativeGallery_PickMedia( SelectedMediaPath, (int) ( mediaType & ~MediaType.Audio ) );
+				NGMediaReceiveCallbackiOS.Initialize( callback, null );
+				_NativeGallery_PickMedia( SelectedMediaPath, (int) ( mediaType & ~MediaType.Audio ), PermissionFreeMode ? 1 : 0, 1 );
 			}
 #else
 			if( callback != null )
@@ -527,7 +601,7 @@ public static class NativeGallery
 
 	private static Permission GetMultipleMediaFromGallery( MediaPickMultipleCallback callback, MediaType mediaType, string mime, string title )
 	{
-		Permission result = RequestPermission( true );
+		Permission result = RequestPermission( PermissionType.Read );
 		if( result == Permission.Granted && !IsMediaPickerBusy() )
 		{
 			if( CanSelectMultipleFilesFromGallery() )
@@ -535,10 +609,18 @@ public static class NativeGallery
 #if !UNITY_EDITOR && UNITY_ANDROID
 				AJC.CallStatic( "PickMedia", Context, new NGMediaReceiveCallbackAndroid( null, callback ), (int) mediaType, true, SelectedMediaPath, mime, title );
 #elif !UNITY_EDITOR && UNITY_IOS
-				Debug.LogError( "Picking multiple media is not supported on iOS" );
+				if( mediaType == MediaType.Audio )
+				{
+					Debug.LogError( "Picking audio files is not supported on iOS" );
 
-				if( callback != null )
-					callback( null );
+					if( callback != null ) // Selecting audio files is not supported on iOS
+						callback( null );
+				}
+				else
+				{
+					NGMediaReceiveCallbackiOS.Initialize( null, callback );
+					_NativeGallery_PickMedia( SelectedMediaPath, (int) ( mediaType & ~MediaType.Audio ), PermissionFreeMode ? 1 : 0, 0 );
+				}
 #else
 				if( callback != null )
 					callback( null );
@@ -585,7 +667,7 @@ public static class NativeGallery
 			Graphics.Blit( texture, rt );
 			RenderTexture.active = rt;
 
-			sourceTexReadable = new Texture2D( texture.width, texture.height, texture.format, false );
+			sourceTexReadable = new Texture2D( texture.width, texture.height, isJpeg ? TextureFormat.RGB24 : TextureFormat.RGBA32, false );
 			sourceTexReadable.ReadPixels( new Rect( 0, 0, texture.width, texture.height ), 0, 0, false );
 			sourceTexReadable.Apply( false, false );
 		}
@@ -639,7 +721,7 @@ public static class NativeGallery
 		string loadPath = imagePath;
 #endif
 
-		String extension = Path.GetExtension( imagePath ).ToLowerInvariant();
+		string extension = Path.GetExtension( imagePath ).ToLowerInvariant();
 		TextureFormat format = ( extension == ".jpg" || extension == ".jpeg" ) ? TextureFormat.RGB24 : TextureFormat.RGBA32;
 
 		Texture2D result = new Texture2D( 2, 2, format, generateMipmaps, linearColorSpace );
@@ -674,7 +756,7 @@ public static class NativeGallery
 		return result;
 	}
 
-	public static Texture2D GetVideoThumbnail( string videoPath, int maxSize = -1, double captureTimeInSeconds = -1.0 )
+	public static Texture2D GetVideoThumbnail( string videoPath, int maxSize = -1, double captureTimeInSeconds = -1.0, bool markTextureNonReadable = true )
 	{
 		if( maxSize <= 0 )
 			maxSize = SystemInfo.maxTextureSize;
@@ -688,7 +770,7 @@ public static class NativeGallery
 #endif
 
 		if( !string.IsNullOrEmpty( thumbnailPath ) )
-			return LoadImageAtPath( thumbnailPath, maxSize );
+			return LoadImageAtPath( thumbnailPath, maxSize, markTextureNonReadable );
 		else
 			return null;
 	}
@@ -722,7 +804,7 @@ public static class NativeGallery
 				mimeType = properties[2].Trim();
 				if( mimeType.Length == 0 )
 				{
-					String extension = Path.GetExtension( imagePath ).ToLowerInvariant();
+					string extension = Path.GetExtension( imagePath ).ToLowerInvariant();
 					if( extension == ".png" )
 						mimeType = "image/png";
 					else if( extension == ".jpg" || extension == ".jpeg" )

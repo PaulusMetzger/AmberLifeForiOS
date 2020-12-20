@@ -39,7 +39,7 @@ public class Termit : MonoBehaviour
     void Returing()
     {
         Vector3 targetDirection = homeT.position - transform.position;
-        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(targetDirection, Vector3.up), Time.deltaTime * 10);        
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(targetDirection, transform.up), Time.deltaTime * 10);        
     }
 
     // Update is called once per frame

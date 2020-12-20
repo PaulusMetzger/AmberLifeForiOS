@@ -59,7 +59,6 @@ public class Lizard : MonoBehaviour
                     lizCircle = Random.Range(0, 10);
                     once = true;
                 }
-
             }
             else  // ящерица не дома
             {
@@ -91,7 +90,7 @@ public class Lizard : MonoBehaviour
     void Returning()
     {
         Vector3 targetDirection = lizHome.position - transform.position;
-        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(targetDirection, Vector3.up), Time.deltaTime*2);
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(targetDirection, transform.up), Time.deltaTime*2);
     }
     IEnumerator WaitAnimation()
     {
